@@ -1,4 +1,4 @@
-# entropy-in-black-hole
+# entropy-across-black-hole
 
 Alice and Bob shared a Bell state initially, then Alice free fell into a Schwarzchild black hole, Bob hoved over the event
 horizon. We can assume Bob is in a Rindler space, which is a reference frame with constant acceleration. Since Bob only has
