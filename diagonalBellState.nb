@@ -4,9 +4,14 @@ sig2 = {{0, -I}, {I, 0}}
 sig3 = {{1, 0}, {0, -1}}
 l1[o_, r_] := Exp[-o*Sqrt[1 - 1/r]]
 l2[o_, r_] := Exp[o*Sqrt[1 - 1/r]]
-c1 = 1; c2 = -1; c3 = 1
+c1 = 1
+c2 = -1
+c3 = 1
 o = 1
 r = 1
+Clear[o, r]
+Clear[c1, c2, c3]
+
 part1 = c3* Outer[Times, sig3, sig3] 
 
 part2 = Outer[Times, sig0, {{1, 0}, {0, 0}}]
@@ -22,10 +27,10 @@ rouAI = 1/4/(1 + l1[o, r]) * (part1 + part2 + part3 + part4 + part5)
 
 rouAI = Flatten[rouAI, {{1, 3}, {2, 4}}] 
 
-rouAI // MatrixForm
-
 Eigenvalues[rouAI]
 
 Eigenvectors[rouAI]
 
 MatrixQ[rouAI]
+
+rouAI // MatrixForm
