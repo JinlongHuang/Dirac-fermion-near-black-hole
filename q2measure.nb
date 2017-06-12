@@ -1,0 +1,313 @@
+(*Basic definition *)
+
+sig0 = {{1, 0}, {0, 1}};
+sig1 = {{0, 1}, {1, 0}} ;
+sig2 = {{0, -I}, {I, 0}};
+sig3 = {{1, 0}, {0, -1}};
+l2[o_, r_] := E^(o Sqrt[1 - 1/r]);
+hbin[p_] = -p Log[2, p] - (1 - p) Log[2, (1 - p)];
+c1 = 1; c2 = -1; c3 = 1;
+
+(*Expression for Subscript[\[Rho], AI]*)
+
+Clear[part1, part2, part3, part4, part5, rouAI, eigRouAI];
+part1[c3_] := c3* KroneckerProduct[ sig3, sig3] ;
+part2 := KroneckerProduct[sig0, {{1, 0}, {0, 0}}];
+part3[o_, r_] := (3 + l2[o, r] + 2/l2[o, r])/(1 + l2[o, r]) * 
+   KroneckerProduct[sig0, ( {
+      {0, 0},
+      {0, 1}
+     } )];
+part4[c1_, o_, r_] :=  
+  c1 Sqrt[1 + 1/l2[o, r]] * KroneckerProduct[sig1, sig1];
+part5[c2_, o_, r_] := 
+  c2  Sqrt[1 + 1/l2[o, r]]* KroneckerProduct[sig2, sig2]  ;
+rouAI[c1_, c2_, c3_, o_, r_] = 
+  1/4 1/(1 + 
+    E^(-o Sqrt[1 - 1/r])) (part1[c3] + part2 + part3[o, r] + 
+     part4[c1, o, r] + part5[c2, o, r]);
+
+(*?rouAI
+rouAI[1,-1,1,10,1.03]
+MatrixQ[rouAI[c1,c2,c3,o,r]]
+Eigenvalues[rouAI[c1,c2,c3,o,r]]*)
+
+eigRouAI[c1_, c2_, c3_, o_, r_]  = Eigenvalues[rouAI[1, -1, 1, o, r]];
+ eigRouAI[c1, c2, c3, o, r] = Simplify[eigRouAI[c1, c2, c3, o, r] ]
+
+(*---------------------- Subscript[S, Subscript[\[Rho], I]] \
+---------------------*)
+Clear[rouI, eigRouI, sRouI];
+rouI[c1_, c2_, c3_, o_, r_]  := 
+  rouAI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouAI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+eigRouI[c1_, c2_, c3_, o_, r_]  = 
+ Simplify[rouI[c1, c2, c3, o, r]][[1, 1]]
+sRouI[c1_, c2_, c3_, o_, r_]  := hbin[eigRouI[c1, c2, c3, o, r]];
+sRouI[c1_, c2_, c3_, o_, r_]  = Simplify[sRouI[c1, c2, c3, o, r]];
+sRouI[c1, c2, c3, 50, 1.00]
+
+
+
+(*---------------------- Subscript[S, Subscript[\[Sigma], x]] \
+---------------------*)
+(* S(Subscript[\[Rho]^Subscript[\[Sigma], x], \
+Subscript[I, 0]]) in Subscript[S, \[Sigma]^x] *)
+
+Clear[rouX0, rouX0AI, rouIX0, pX0, eigRouIX0, sRouIX0];
+rouX0 := KroneckerProduct[( {
+     {1/2, 1/2},
+     {1/2, 1/2}
+    } ), sig0];
+rouX0AI[c1_, c2_, c3_, o_, r_] := rouX0.rouAI[c1, c2, c3, o, r];
+rouIX0[c1_, c2_, c3_, o_, r_] := 
+  rouX0AI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouX0AI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+pX0[c1_, c2_, c3_, o_, r_] := Tr[rouIX0[c1, c2, c3, o, r]];
+rouIX0[c1_, c2_, c3_, o_, r_] = 
+  rouIX0[c1, c2, c3, o, r]/pX0[c1, c2, c3, o, r];
+eigRouIX0[c1_, c2_, c3_, o_, r_] := 
+  Eigenvalues[rouIX0[c1, c2, c3, o, r]];
+eigRouIX0[c1_, c2_, c3_, o_, r_] = 
+ Simplify[eigRouIX0[c1, c2, c3, o, r]]
+sRouIX0[c1_, c2_, c3_, o_, r_] := 
+  hbin[eigRouIX0[c1, c2, c3, o, r][[1]]];
+sRouIX0[c1_, c2_, c3_, o_, r_] = Simplify[sRouIX0][c1, c2, c3, o, r];
+
+
+
+(* S(Subscript[\[Rho]^Subscript[\[Sigma], x], Subscript[I, 1]]) in \
+Subscript[S, \[Sigma]^x] *)
+
+Clear[rouX1, rouX1AI, rouIX1, pX1, eigRouIX1, sRouIX1];
+rouX1 := KroneckerProduct[( {
+     {1/2, -(1/2)},
+     {-(1/2), 1/2}
+    } ), sig0];
+rouX1AI[c1_, c2_, c3_, o_, r_] := rouX1.rouAI[c1, c2, c3, o, r];
+rouIX1[c1_, c2_, c3_, o_, r_] := 
+  rouX1AI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouX1AI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+pX1[c1_, c2_, c3_, o_, r_] := Tr[rouIX1[c1, c2, c3, o, r]];
+rouIX1[c1_, c2_, c3_, o_, r_] = 
+  rouIX1[c1, c2, c3, o, r]/pX1[c1, c2, c3, o, r];
+eigRouIX1[c1_, c2_, c3_, o_, r_] := 
+  Eigenvalues[rouIX1[c1, c2, c3, o, r]];
+eigRouIX1[c1_, c2_, c3_, o_, r_] = 
+ Simplify[eigRouIX1[c1, c2, c3, o, r]]
+sRouIX1[c1_, c2_, c3_, o_, r_] := 
+  hbin[eigRouIX1[c1, c2, c3, o, r][[1]]];
+sRouIX1[c1_, c2_, c3_, o_, r_] =  Simplify[sRouIX1[c1, c2, c3, o, r]];
+
+
+
+(* Subscript[S, Subscript[\[Sigma], x]] *)
+Clear[sX]
+sX[c1_, c2_, c3_, o_, r_] = 
+  pX0[c1, c2, c3, o, r] *sRouIX0[c1, c2, c3, o, r] + 
+   pX1[c1, c2, c3, o, r] * sRouIX1[c1, c2, c3, o, r];
+sX[c1, c2, c3, o, r] = Simplify[sX[c1, c2, c3, o, r]];
+sX[c1, c2, c3, 50, 1.00]
+
+
+
+(*----------------------------Subscript[S, (\[Sigma]^y)]--------------------------*)
+\
+(* S(Subscript[\[Rho]^Subscript[\[Sigma], y], Subscript[I, 0]]) in \
+Subscript[S, \[Sigma]^y] *)
+
+Clear[rouY0, rouY0AI, rouIY0, pY0, eigRouIY0, sRouIY0];
+rouY0 := KroneckerProduct[({{1/2, -I/2}, {I/2, 1/2}}), sig0];
+rouY0AI[c1_, c2_, c3_, o_, r_] := rouY0.rouAI[c1, c2, c3, o, r];
+rouIY0[c1_, c2_, c3_, o_, r_] := 
+  rouY0AI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouY0AI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+pY0[c1_, c2_, c3_, o_, r_] := Tr[rouIY0[c1, c2, c3, o, r]];
+rouIY0[c1_, c2_, c3_, o_, r_] = 
+  rouIY0[c1, c2, c3, o, r]/pY0[c1, c2, c3, o, r];
+eigRouIY0[c1_, c2_, c3_, o_, r_] := 
+  Eigenvalues[rouIY0[c1, c2, c3, o, r]];
+eigRouIY0[c1_, c2_, c3_, o_, r_] = 
+ Simplify[eigRouIY0[c1, c2, c3, o, r]]
+sRouIY0[c1_, c2_, c3_, o_, r_] := 
+  hbin[eigRouIY0[c1, c2, c3, o, r][[1]]];
+sRouIY0[c1_, c2_, c3_, o_, r_] = Simplify[sRouIY0][c1, c2, c3, o, r];
+
+
+
+(* S(Subscript[\[Rho]^Subscript[\[Sigma], y], Subscript[I, 1]]) in \
+Subscript[S, \[Sigma]^y] *)
+
+Clear[rouY1, rouY1AI, rouIY1, pY1, eigRouIY1, sRouIY1];
+rouY1 := KroneckerProduct[( {
+     {1/2, I/2},
+     {-(I/2), 1/2}
+    } ), sig0];
+rouY1AI[c1_, c2_, c3_, o_, r_] := rouY1.rouAI[c1, c2, c3, o, r];
+rouIY1[c1_, c2_, c3_, o_, r_] := 
+  rouY1AI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouY1AI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+pY1[c1_, c2_, c3_, o_, r_] := Tr[rouIY1[c1, c2, c3, o, r]];
+rouIY1[c1_, c2_, c3_, o_, r_] = 
+  rouIY1[c1, c2, c3, o, r]/pY1[c1, c2, c3, o, r];
+eigRouIY1[c1_, c2_, c3_, o_, r_] := 
+  Eigenvalues[rouIY1[c1, c2, c3, o, r]];
+eigRouIY1[c1_, c2_, c3_, o_, r_] = 
+ Simplify[eigRouIY1[c1, c2, c3, o, r]]
+sRouIY1[c1_, c2_, c3_, o_, r_] := 
+  hbin[eigRouIY1[c1, c2, c3, o, r][[1]]];
+sRouIY1[c1_, c2_, c3_, o_, r_] =  Simplify[sRouIY1[c1, c2, c3, o, r]];
+
+
+
+(* Subscript[S, Subscript[\[Sigma], y]] *)
+Clear[sY]
+sY[c1_, c2_, c3_, o_, r_] = 
+  pY0[c1, c2, c3, o, r] *sRouIY0[c1, c2, c3, o, r] + 
+   pY1[c1, c2, c3, o, r] * sRouIY1[c1, c2, c3, o, r];
+sY[c1, c2, c3, o, r] = Simplify[sY[c1, c2, c3, o, r]];
+sY[c1, c2, c3, 50, 1.00]
+
+
+(*----------------------------Subscript[S, (\[Sigma]^z)]--------------------------*)
+\
+(* S(Subscript[\[Rho]^Subscript[\[Sigma], z], Subscript[I, 0]]) in \
+Subscript[S, \[Sigma]^z] *)
+
+Clear[rouZ0, rouZ0AI, rouIZ0, pZ0, eigRouIZ0, sRouIZ0];
+rouZ0 = KroneckerProduct[({{0, 0}, {0, 1}}), sig0];
+rouZ0AI[c1_, c2_, c3_, o_, r_] := rouZ0.rouAI[c1, c2, c3, o, r];
+rouIZ0[c1_, c2_, c3_, o_, r_] := 
+  rouZ0AI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouZ0AI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+pZ0[c1_, c2_, c3_, o_, r_] := Tr[rouIZ0[c1, c2, c3, o, r]];
+rouIZ0[c1_, c2_, c3_, o_, r_] = 
+  rouIZ0[c1, c2, c3, o, r]/pZ0[c1, c2, c3, o, r];
+eigRouIZ0[c1_, c2_, c3_, o_, r_] := 
+  Eigenvalues[rouIZ0[c1, c2, c3, o, r]];
+eigRouIZ0[c1_, c2_, c3_, o_, r_] = 
+ Simplify[eigRouIZ0[c1, c2, c3, o, r]]
+sRouIZ0[c1_, c2_, c3_, o_, r_] = 0;
+
+
+
+(* S(Subscript[\[Rho]^Subscript[\[Sigma], z], Subscript[I, 1]]) in \
+Subscript[S, \[Sigma]^z] *)
+
+Clear[rouZ1, rouZ1AI, rouIZ1, pZ1, eigRouIZ1, sRouIZ1];
+rouZ1 := KroneckerProduct[( {
+     {1, 0},
+     {0, 0}
+    } ), sig0];
+rouZ1AI[c1_, c2_, c3_, o_, r_] := rouZ1.rouAI[c1, c2, c3, o, r];
+rouIZ1[c1_, c2_, c3_, o_, r_] := 
+  rouZ1AI[c1, c2, c3, o, r][[1 ;; 2, 1 ;; 2]] + 
+   rouZ1AI[c1, c2, c3, o, r][[3 ;; 4, 3 ;; 4]];
+pZ1[c1_, c2_, c3_, o_, r_] := Tr[rouIZ1[c1, c2, c3, o, r]];
+rouIZ1[c1_, c2_, c3_, o_, r_] = 
+  rouIZ1[c1, c2, c3, o, r]/pZ1[c1, c2, c3, o, r];
+eigRouIZ1[c1_, c2_, c3_, o_, r_] := 
+  Eigenvalues[rouIZ1[c1, c2, c3, o, r]];
+eigRouIZ1[c1_, c2_, c3_, o_, r_] = 
+ Simplify[eigRouIZ1[c1, c2, c3, o, r]]
+sRouIZ1[c1_, c2_, c3_, o_, r_] := 
+  hbin[eigRouIZ1[c1, c2, c3, o, r][[1]]];
+sRouIZ1[c1_, c2_, c3_, o_, r_] =  Simplify[sRouIZ1[c1, c2, c3, o, r]];
+
+
+(* Subscript[S, Subscript[\[Sigma], z]] *)
+Clear[sZ]
+sZ[c1_, c2_, c3_, o_, r_] = 
+  pZ0[c1, c2, c3, o, r] *sRouIZ0[c1, c2, c3, o, r] + 
+   pZ1[c1, c2, c3, o, r] * sRouIZ1[c1, c2, c3, o, r];
+sZ[c1, c2, c3, o, r] = Simplify[sZ[c1, c2, c3, o, r]];
+sZ[c1, c2, c3, 50, 1.00]
+
+
+
+(*----------------------------(Subscript[Q, 2]^xy)--------------------------*)
+
+Clear[q2XY];
+q2XY[c1_, c2_, c3_, o_, r_] = -2 *sRouI[c1, c2, c3, o, r] + 
+   sX[c1, c2, c3, o, r] + sY[c1, c2, c3, o, r];
+q2XY[c1, c2, c3, 50, 1.00]
+Plot[{q2XY[c1, c2, c3, 10, r] + 2, q2XY[c1, c2, c3, 15, r] + 2, 
+  q2XY[c1, c2, c3, 30, r] + 2, q2XY[c1, c2, c3, 50, r] + 2}, {r, 1, 
+  1.05}, Frame -> True, 
+ FrameLabel -> {"\!\(\*SubscriptBox[\(R\), \(0\)]\)", 
+   "\!\(\*SuperscriptBox[SubscriptBox[\(U\), \(b\)], \(xy\)]\)"}, 
+ FrameTicks -> {{{0, 0.5, 1, 1.5, 1.796}, None}, {All, None}}, 
+ RotateLabel -> False, 
+ PlotStyle -> {{Dashed, Blue, Thickness[0.003]}, {Dashed, Green, 
+    Thickness[0.003]}, {Dashed, Red, Thickness[0.003]}, {Black, 
+    Thickness[0.003]}}, 
+ PlotLabels -> 
+  Placed[{"\[CapitalOmega]=10", "\[CapitalOmega]=15", 
+    "\[CapitalOmega]=30", "\[CapitalOmega]=50"}, {Scaled[0.85], 
+    Above}]]
+
+DensityPlot[q2XY[c1, c2, c3, 3/t, r], {t, 0.02, 1}, {r, 1, 1.05}, 
+ Frame -> True, 
+ FrameLabel -> {{"\!\(\*SubscriptBox[\(R\), \(0\)]\)", 
+    ""}, {"\!\(\*SubscriptBox[\(T\), \(H\)]\)", 
+    "\!\(\*SuperscriptBox[SubscriptBox[\(Q\), \(2\)], \(xy\)]\)"}}, 
+ RotateLabel -> False, ColorFunction -> "TemperatureMap"]
+
+
+(*----------------------------(Subscript[Q, 2]^yz)--------------------------*)
+
+Clear[q2YZ];
+q2YZ[c1_, c2_, c3_, o_, r_] = -2 *sRouI[c1, c2, c3, o, r] + 
+   sY[c1, c2, c3, o, r] + sZ[c1, c2, c3, o, r];
+q2YZ[c1, c2, c3, 50, 1.00]
+Plot[{q2YZ[c1, c2, c3, 10, r] + 2, q2YZ[c1, c2, c3, 15, r] + 2, 
+  q2YZ[c1, c2, c3, 30, r] + 2, q2YZ[c1, c2, c3, 50, r] + 2}, {r, 1, 
+  1.05}, Frame -> True, 
+ FrameLabel -> {"\!\(\*SubscriptBox[\(R\), \(0\)]\)", 
+   "\!\(\*SuperscriptBox[SubscriptBox[\(U\), \(b\)], \(yz\)]\)"}, 
+ RotateLabel -> False, 
+ FrameTicks -> {{{0, 0.5, 1, 1.5, 2.09}, None}, {All, None}}, 
+ PlotStyle -> {{Dashed, Blue, Thickness[0.003]}, {Dashed, Green, 
+    Thickness[0.003]}, {Dashed, Red, Thickness[0.003]}, {Black, 
+    Thickness[0.003]}}, 
+ PlotLabels -> 
+  Placed[{"\[CapitalOmega]=10", "\[CapitalOmega]=15", 
+    "\[CapitalOmega]=30", "\[CapitalOmega]=50"}, {Scaled[0.85], 
+    Above}]]
+
+DensityPlot[q2YZ[c1, c2, c3, 3/t, r], {t, 0.02, 1}, {r, 1, 1.05}, 
+ Frame -> True, 
+ FrameLabel -> {{"\!\(\*SubscriptBox[\(R\), \(0\)]\)", 
+    ""}, {"\!\(\*SubscriptBox[\(T\), \(H\)]\)", 
+    "\!\(\*SuperscriptBox[SubscriptBox[\(Q\), \(2\)], \(yz\)]\)"}}, 
+ RotateLabel -> False, ColorFunction -> "TemperatureMap"]
+
+
+
+(*----------------------------(Subscript[Q, 2]^zx)--------------------------*)
+
+Clear[q2ZX];
+q2ZX[c1_, c2_, c3_, o_, r_] = -2 *sRouI[c1, c2, c3, o, r] + 
+   sZ[c1, c2, c3, o, r] + sX[c1, c2, c3, o, r];
+q2ZX[c1, c2, c3, 50, 1.00]
+Plot[{q2ZX[c1, c2, c3, 10, r] + 2, q2ZX[c1, c2, c3, 15, r] + 2, 
+  q2ZX[c1, c2, c3, 30, r] + 2, q2ZX[c1, c2, c3, 50, r] + 2}, {r, 1, 
+  1.05}, Frame -> True, 
+ FrameLabel -> {"\!\(\*SubscriptBox[\(R\), \(0\)]\)", 
+   "\!\(\*SuperscriptBox[SubscriptBox[\(U\), \(b\)], \(zx\)]\)"}, 
+ RotateLabel -> False, 
+ FrameTicks -> {{{0, 0.5, 1, 1.5, 2.09}, None}, {All, None}}, 
+ PlotStyle -> {{Dashed, Blue, Thickness[0.003]}, {Dashed, Green, 
+    Thickness[0.003]}, {Dashed, Red, Thickness[0.003]}, {Black, 
+    Thickness[0.003]}}, 
+ PlotLabels -> 
+  Placed[{"\[CapitalOmega]=10", "\[CapitalOmega]=15", 
+    "\[CapitalOmega]=30", "\[CapitalOmega]=50"}, {Scaled[0.85], 
+    Above}]]
+
+DensityPlot[q2ZX[c1, c2, c3, 3/t, r], {t, 0.02, 1}, {r, 1, 1.05}, 
+ Frame -> True, 
+ FrameLabel -> {{"\!\(\*SubscriptBox[\(R\), \(0\)]\)", 
+    ""}, {"\!\(\*SubscriptBox[\(T\), \(H\)]\)", 
+    "\!\(\*SuperscriptBox[SubscriptBox[\(Q\), \(2\)], \(zx\)]\)"}}, 
+ RotateLabel -> False, ColorFunction -> "TemperatureMap"]
