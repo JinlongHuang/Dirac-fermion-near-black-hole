@@ -1,10 +1,7 @@
-# entropy-across-black-hole
+# generalized-entropy-uncertainty-relation-in-Schwarzschild-spacetime
 
-Alice and Bob shared a Bell state initially, then Alice free fell into a Schwarzchild black hole, Bob hoved over the event
-horizon. We can assume Bob is in a Rindler space, which is a reference frame with constant acceleration. Since Bob only has
-access to half of the universe, the Von Neumann entropy of his qubit is smaller than Alice's qubit.
+Alice and Bob shared a maximum entangled state(Bell state) initially, then Alice free fell into a Schwarzchild black hole, Bob hoved over near the event horizon. We can assume Bob is in a Rindler space(R0=[1,1.05]), which is a reference frame with constant acceleration. Since Bob only has access to half of the universe, the other half of the universe is traced out, so the Von Neumann entropy of his qubit is smaller than Alice's qubit.
 
-In this code I plotted the Von Neumann entropy observed by Bob vs temperature in the event horizon. As the temperature goes up, 
-the entanglement entropy goes down, from 0.693 to 0.562.
+Let's now consider more generally. Defined S be the Von Neumann entropy. We have S(M1|I)+S(M2|I)>=-log(C1)+S(A)-2S(I)+S(M1)+S(M2). Thus Bob have more uncertainty about Alice's information if Bob is near a Schwarzschild black hole.
 
 If you have any questions, please feel free to ask. :)
